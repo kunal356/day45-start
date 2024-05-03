@@ -1,10 +1,29 @@
 from bs4 import BeautifulSoup
+import requests
+# Scrapping website: https://news.ycombinator.com/
+response = requests.get("https://news.ycombinator.com/")
+# print(response.text)
 
-with open('website.html', mode='r') as file:
-    contents = file.read()
-    # print(contents)
+soup = BeautifulSoup(response.text, "html.parser")
+articles = soup.select("span.titleline > a")
+article_texts = []
+article_links = []
+for article in articles:
+    article_texts.append(article.text)
+    article_links.append(article.get("href"))
 
-soup = BeautifulSoup(contents, "html.parser")
+article_upvotes = [int((upvote.getText()).split(" ")[0]) for upvote in soup.select(".score")]
+
+max_upvote_index = article_upvotes.index(max(article_upvotes))
+print(article_texts[max_upvote_index])
+print(article_links[max_upvote_index])
+print(article_upvotes[max_upvote_index])
+
+# with open('website.html', mode='r') as file:
+#     contents = file.read()
+#     # print(contents)
+#
+# soup = BeautifulSoup(contents, "html.parser")
 # print(soup.title)
 # print(soup.title.name) # Prints the name of the tag
 # print(soup.title.string) # Prints the string inside the tag
